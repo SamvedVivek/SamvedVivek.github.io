@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Neural Network Competition Log · Samved</title>
+<meta name="description" content="Strategies behind five neural network competitions (A1 to A5): noise robustness, adversarial payloads, confidence attacks, and embedding alignment." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #E8E9ED;
+    --paper-2: #E1E3E8;
+    --raised: #FCFCFD;
+    --ink: #13151B;
+    --ink-soft: #525863;
+    --ink-faint: #878D9A;
+    --rule: #D2D5DC;
+    --rule-soft: #E0E2E8;
+    --signal: #2A3CDE;
+    --signal-2: #5766F2;
+    --signal-soft: #E7E9FD;
+    --flag: #9F2340;
+    --flag-soft: #F6E4E9;
+
+    --sh-sm: 0 1px 2px rgba(19,21,27,0.05), 0 1px 1px rgba(19,21,27,0.04);
+    --sh-md: 0 6px 20px -8px rgba(19,21,27,0.14), 0 2px 6px -3px rgba(19,21,27,0.08);
+    --sh-lg: 0 22px 48px -20px rgba(19,21,27,0.28), 0 6px 16px -8px rgba(19,21,27,0.12);
+
+    --display: "Space Grotesk", system-ui, sans-serif;
+    --body: "Inter", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+
+    --wrap: 920px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    background-image:
+      linear-gradient(var(--rule-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-position: -1px -1px;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(120% 60% at 50% -8%, rgba(42,60,222,0.10) 0%, rgba(42,60,222,0) 55%),
+      radial-gradient(ellipse at 50% 34%, rgba(232,233,237,0) 0%, var(--paper) 80%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  a { color: var(--signal); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible, .navlink:focus-visible, .rail a:focus-visible {
+    outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 3px;
+  }
+
+  /* scroll progress */
+  #progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+    background: linear-gradient(90deg, var(--signal), var(--signal-2));
+    z-index: 60;
+    transition: width 0.08s linear;
+  }
+
+  /* ---------- top nav ---------- */
+  header.nav {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(232,233,237,0.82);
+    backdrop-filter: blur(10px) saturate(1.1);
+    border-bottom: 1px solid var(--rule);
+  }
+  .nav-inner {
+    max-width: var(--wrap); margin: 0 auto; padding: 13px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .brand { font-family: var(--mono); font-weight: 700; font-size: 14px; letter-spacing: 0.02em; color: var(--ink); }
+  .brand span { color: var(--ink-faint); font-weight: 400; }
+  a.brand { color: var(--ink); text-decoration: none; }
+  a.brand:hover, a.brand:hover span { color: var(--signal); text-decoration: none; }
+  .navlinks { display: flex; gap: 2px; flex-wrap: wrap; }
+  .navlink {
+    font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--ink-soft);
+    padding: 5px 10px; border-radius: 6px; transition: background 0.18s, color 0.18s;
+  }
+  .navlink:hover { background: var(--signal-soft); color: var(--signal); text-decoration: none; }
+
+  /* ---------- side rail ---------- */
+  .rail {
+    position: fixed; top: 50%; right: 28px; transform: translateY(-50%);
+    z-index: 30; display: none; flex-direction: column; gap: 4px;
+  }
+  .rail a {
+    display: flex; align-items: center; gap: 10px; justify-content: flex-end;
+    font-family: var(--mono); font-size: 12px; color: var(--ink-faint);
+    padding: 5px 2px; transition: color 0.2s;
+  }
+  .rail a .lbl { opacity: 0; transform: translateX(6px); transition: opacity 0.2s, transform 0.2s; }
+  .rail a .tick { width: 22px; height: 2px; background: var(--rule); border-radius: 2px; transition: all 0.25s; }
+  .rail a:hover { text-decoration: none; color: var(--ink-soft); }
+  .rail a:hover .lbl { opacity: 1; transform: none; }
+  .rail a.active { color: var(--signal); }
+  .rail a.active .lbl { opacity: 1; transform: none; }
+  .rail a.active .tick { width: 34px; background: var(--signal); box-shadow: 0 0 0 3px var(--signal-soft); }
+  @media (min-width: 1180px) { .rail { display: flex; } }
+
+  /* ---------- reveal ---------- */
+  html.js .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s cubic-bezier(.2,.7,.2,1), transform 0.7s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i, 0) * 70ms); }
+  html.js .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 92px 0 66px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--signal); margin: 0 0 20px;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--signal); display: inline-block; }
+  .hero h1 {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(2.5rem, 6.8vw, 4.4rem); line-height: 1.0; letter-spacing: -0.025em;
+    margin: 0 0 24px; max-width: 15ch;
+  }
+  .hero h1 em { font-style: normal; color: var(--signal); }
+  .hero .lede { font-size: 1.2rem; color: var(--ink-soft); max-width: 54ch; margin: 0 0 34px; }
+  .meta-line { font-family: var(--mono); font-size: 13px; color: var(--ink-faint); display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  .meta-line b { color: var(--ink); font-weight: 500; }
+
+  /* signature */
+  .signature { margin-top: 46px; border: 1px solid var(--rule); background: var(--raised); border-radius: 12px; overflow: hidden; box-shadow: var(--sh-md); }
+  .sig-bar {
+    display: flex; align-items: center; justify-content: space-between; padding: 12px 16px;
+    border-bottom: 1px solid var(--rule-soft); font-family: var(--mono); font-size: 12px; color: var(--ink-faint); letter-spacing: 0.04em;
+  }
+  .sig-bar .left { display: flex; align-items: center; gap: 10px; }
+  .sig-bar .live { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 0 rgba(42,60,222,0.5); animation: pulse 2.2s infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(42,60,222,0.45); } 70% { box-shadow: 0 0 0 7px rgba(42,60,222,0); } 100% { box-shadow: 0 0 0 0 rgba(42,60,222,0); } }
+  @media (prefers-reduced-motion: reduce) { .sig-bar .live { animation: none; } }
+  .sig-bar .readout { color: var(--signal); font-weight: 700; }
+  #noise { display: block; width: 100%; height: 168px; background: linear-gradient(180deg, #FCFCFD, #F4F5F8); }
+
+  /* ---------- strategy sections ---------- */
+  main { padding-bottom: 30px; }
+  .strategy { padding: 66px 0; border-top: 1px solid var(--rule); }
+
+  .s-head { display: grid; grid-template-columns: auto 1fr; gap: 20px 22px; align-items: start; margin-bottom: 30px; }
+  .s-index {
+    font-family: var(--display); font-weight: 700; font-size: clamp(2.6rem, 7vw, 3.8rem);
+    line-height: 0.8; color: transparent; -webkit-text-stroke: 1.4px var(--rule); letter-spacing: -0.03em; user-select: none;
+  }
+  .s-titles { min-width: 0; }
+  .s-tagrow { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+  .s-tag {
+    font-family: var(--mono); font-weight: 700; font-size: 14px; color: var(--raised); background: var(--ink);
+    padding: 3px 10px; border-radius: 5px; letter-spacing: 0.03em;
+  }
+  .s-kind { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
+  .strategy h2 {
+    font-family: var(--display); font-weight: 600; font-size: clamp(1.55rem, 3.8vw, 2.2rem);
+    letter-spacing: -0.018em; line-height: 1.1; margin: 0 0 8px;
+  }
+  .s-sub { font-family: var(--mono); font-size: 13px; color: var(--ink-faint); margin: 0; letter-spacing: 0.02em; }
+
+  /* spec strip */
+  .spec {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px; margin: 0 0 32px;
+  }
+  .spec .cell {
+    padding: 14px 16px; background: var(--raised); border: 1px solid var(--rule-soft);
+    border-radius: 10px; box-shadow: var(--sh-sm); transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .spec .cell:hover { transform: translateY(-3px); box-shadow: var(--sh-md); }
+  .spec .k { display: block; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
+  .spec .v { font-family: var(--mono); font-size: 15px; font-weight: 500; color: var(--ink); }
+  .spec .v.hot { color: var(--signal); }
+
+  .strategy p { margin: 0 0 18px; max-width: 68ch; }
+  .strategy p:last-child { margin-bottom: 0; }
+
+  .phase {
+    font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--signal);
+    margin: 34px 0 12px; display: flex; align-items: center; gap: 12px;
+  }
+  .phase::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--rule), transparent); }
+
+  /* callouts */
+  .note {
+    border: 1px solid var(--rule-soft); border-left: 3px solid var(--signal);
+    background: var(--signal-soft); padding: 18px 22px; border-radius: 0 12px 12px 0;
+    margin: 26px 0; max-width: 68ch; box-shadow: var(--sh-sm);
+  }
+  .note.attack { border-left-color: var(--flag); background: var(--flag-soft); }
+  .note .tag { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--signal); display: block; margin-bottom: 8px; }
+  .note.attack .tag { color: var(--flag); }
+  .note p { margin: 0; max-width: none; }
+
+  /* footer */
+  footer { border-top: 1px solid var(--rule); padding: 46px 0 64px; position: relative; z-index: 1; margin-top: 20px; }
+  .foot-inner {
+    max-width: var(--wrap); margin: 0 auto; padding: 0 24px;
+    font-family: var(--mono); font-size: 13px; color: var(--ink-faint);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .foot-inner a { color: var(--ink-soft); }
+
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .nav-inner { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .s-head { grid-template-columns: 1fr; gap: 12px; }
+    .s-index { font-size: 2.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">samved<span> / competition-log</span></a>
+    <nav class="navlinks" aria-label="Strategies">
+      <a class="navlink" href="#a1">A1</a>
+      <a class="navlink" href="#a2">A2</a>
+      <a class="navlink" href="#a3">A3</a>
+      <a class="navlink" href="#a4">A4</a>
+      <a class="navlink" href="#a5">A5</a>
+    </nav>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Progress">
+  <a href="#a1" data-target="a1"><span class="lbl">noise robustness</span><span class="tick"></span></a>
+  <a href="#a2" data-target="a2"><span class="lbl">trusted race</span><span class="tick"></span></a>
+  <a href="#a3" data-target="a3"><span class="lbl">node budget</span><span class="tick"></span></a>
+  <a href="#a4" data-target="a4"><span class="lbl">digit attack</span><span class="tick"></span></a>
+  <a href="#a5" data-target="a5"><span class="lbl">embedding steer</span><span class="tick"></span></a>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow reveal">Neural network competition log</p>
+    <h1 class="reveal" style="--i:1">Signal, noise, and a few <em>honest tricks.</em></h1>
+    <p class="lede reveal" style="--i:2">Five classification competitions in adversarial and noise robust machine learning, and the strategy behind each entry. What we trained on, what we submitted to break other teams, and what surprised us.</p>
+    <div class="meta-line reveal" style="--i:3">
+      <span><b>5</b> competitions</span>
+      <span><b>A1–A5</b> strategies</span>
+      <span>record: <b>5 / 5 cleared</b></span>
+    </div>
+
+    <div class="signature reveal" style="--i:4" aria-hidden="true">
+      <div class="sig-bar">
+        <span class="left"><span class="live"></span> noise sweep · 0 → 100</span>
+        <span>noise <span class="readout" id="noiseReadout">00</span></span>
+      </div>
+      <canvas id="noise"></canvas>
+    </div>
+  </div>
+</section>
+
+<main>
+
+  <!-- A1 -->
+  <section class="strategy" id="a1">
+    <div class="wrap">
+      <div class="s-head reveal">
+        <div class="s-index">01</div>
+        <div class="s-titles">
+          <div class="s-tagrow"><span class="s-tag">A1</span><span class="s-kind">3D shape classifier</span></div>
+          <h2>Guarantee the easy points, memorise one payload</h2>
+          <p class="s-sub">win everything below noise 60, then carry a trick set built to break others</p>
+        </div>
+      </div>
+
+      <div class="s-body">
+        <div class="spec reveal">
+          <div class="cell"><span class="k">task</span><span class="v">sphere / cube / tetra</span></div>
+          <div class="cell"><span class="k">image</span><span class="v">32 × 32 · 0–255</span></div>
+          <div class="cell"><span class="k">noise grid</span><span class="v hot">0–100, step 5 · 21 levels</span></div>
+          <div class="cell"><span class="k">hidden layers</span><span class="v">32 / 16 · m = 48</span></div>
+          <div class="cell"><span class="k">scoring</span><span class="v">own shape 2× · size penalty</span></div>
+          <div class="cell"><span class="k">payload</span><span class="v">9 imgs · 60% · inverted</span></div>
+        </div>
+
+        <p class="reveal">The task was a three way shape classifier: 32 by 32 greyscale images of a sphere, a cube or a tetrahedron, pixels valued 0 to 255. The plan had two halves. First, win every free point: classify every clean and lightly noised image correctly, under any circumstance. We trained on roughly 40k images drawn from the full grid of 21 noise levels, 0 to 100 in steps of 5, across all three shapes. Second, submit one deliberately awkward test set as a team.</p>
+
+        <p class="reveal">Two forces shaped the training. First, the competition scoring rewarded our own shape, the sphere, at double weight and charged a penalty for network size, so a smaller network scored higher. Second, training on the highest noise levels, or on extreme trick sets, dropped our accuracy on the easy images below noise 60. Those easy images were free points we should never give away. So we kept the network small at 32 and 16 units, and kept the tricky training data to a minimum to avoid overfitting.</p>
+
+        <div class="note reveal">
+          <span class="tag">Insight</span>
+          <p>Even with hidden layers of only 32 and 16 units, the network had enough spare capacity to memorise the exact pixel patterns of the trick set we planned to submit. We could carry that payload without meaningfully hurting accuracy on the easy images.</p>
+        </div>
+
+        <div class="note attack reveal">
+          <span class="tag">Payload</span>
+          <p>The submitted set was 9 images: three sets of sphere, cube and tetrahedron, all pushed to 60% noise and colour inverted, with brightness variance added on top to break other teams. Others still solved it, which points to leaks in the group. Inverted pixels can be guessed, but the brightness variance was unlikely to be reproduced independently, and the choice was backed by research on the same failure mode.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- A2 -->
+  <section class="strategy" id="a2">
+    <div class="wrap">
+      <div class="s-head reveal">
+        <div class="s-index">02</div>
+        <div class="s-titles">
+          <div class="s-tagrow"><span class="s-tag">A2</span><span class="s-kind">race · coordination</span></div>
+          <h2>Enter as one team under a single ID</h2>
+          <p class="s-sub">remove collisions between your own entries, then win on group size</p>
+        </div>
+      </div>
+
+      <div class="s-body">
+        <div class="spec reveal">
+          <div class="cell"><span class="k">format</span><span class="v">race</span></div>
+          <div class="cell"><span class="k">team setup</span><span class="v">one team · shared ID</span></div>
+          <div class="cell"><span class="k">purpose</span><span class="v">no teammate collisions</span></div>
+          <div class="cell"><span class="k">group size</span><span class="v hot">larger is better</span></div>
+          <div class="cell"><span class="k">result</span><span class="v">cleared</span></div>
+        </div>
+
+        <p class="reveal">By the second trial the strongest strategy looked like racing alongside a group we could trust. The mechanism that made it work was coordination: we all entered as the same team under a single shared ID, so none of our own submissions could collide with each other. With that internal collision risk removed, the only variable left to push was size, and a larger group was strictly better.</p>
+
+        <p class="reveal">The one thing that did not go to plan was the pairing, since we were placed with a different group for the race rather than our intended ally. The shared team and ID setup held it together regardless, and we cleared it. The setback was in the pairing, not the score.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- A3 -->
+  <section class="strategy" id="a3">
+    <div class="wrap">
+      <div class="s-head reveal">
+        <div class="s-index">03</div>
+        <div class="s-titles">
+          <div class="s-tagrow"><span class="s-tag">A3</span><span class="s-kind">patient classification</span></div>
+          <h2>Be the larger group, flood unique test sets</h2>
+          <p class="s-sub">patient classification with a deliberate node budget</p>
+        </div>
+      </div>
+
+      <div class="s-body">
+        <div class="spec reveal">
+          <div class="cell"><span class="k">nodes used</span><span class="v hot">47</span></div>
+          <div class="cell"><span class="k">optimal range</span><span class="v">45–50</span></div>
+          <div class="cell"><span class="k">role</span><span class="v">larger group</span></div>
+          <div class="cell"><span class="k">tactic</span><span class="v">many unique test sets</span></div>
+        </div>
+
+        <p class="reveal">Getting a single test set wrong was too costly, so we leaned on volume. As the larger group, each of us submitted unique test sets to spread the risk. We also picked specific data that would be genuinely hard for any team running fewer nodes.</p>
+
+        <p class="reveal">Through experimentation we found that 47 nodes could classify any patient in the dataset. The optimal range sat around 45 to 50. We settled on 47 rather than pushing lower, because every node we removed raised the chance of misclassification. That trade is exactly why our A3 score landed close to our A1 score.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- A4 -->
+  <section class="strategy" id="a4">
+    <div class="wrap">
+      <div class="s-head reveal">
+        <div class="s-index">04</div>
+        <div class="s-titles">
+          <div class="s-tagrow"><span class="s-tag">A4</span><span class="s-kind">adversarial digits</span></div>
+          <h2>Fool the digit classifier, then actually draw the digit</h2>
+          <p class="s-sub">confidence baseline first, correct digits by clustering styles</p>
+        </div>
+      </div>
+
+      <div class="s-body">
+        <div class="spec reveal">
+          <div class="cell"><span class="k">pixel budget</span><span class="v">~100 px difference</span></div>
+          <div class="cell"><span class="k">confidence</span><span class="v">PGD from noise</span></div>
+          <div class="cell"><span class="k">sample match</span><span class="v">&lt; 200 px</span></div>
+          <div class="cell"><span class="k">styles / digit</span><span class="v hot">4</span></div>
+          <div class="cell"><span class="k">hit rate</span><span class="v hot">85–95%</span></div>
+        </div>
+
+        <p class="phase reveal">Phase 1 · bank a confidence baseline</p>
+        <p class="reveal">Getting the digit correct looked very hard at first, with only about a 100 pixel budget to work in. So we went for the confidence score instead, and found it was easy to make the network believe a digit was correct. Simple PGD starting from random images reached high confidence with almost no effort. We banked that as a baseline: a safe score we could always fall back to and submit.</p>
+
+        <p class="phase reveal">Phase 2 · mine samples with bezier curves</p>
+        <p class="reveal">Once we were hitting close to 1.0 confidence across the board, we went after correct digits for real. We had LLMs draw cubic bezier curves to generate candidate samples, and treated any curve scoring above 0.8 confidence for a digit as valid data for that digit. Teams 0 and 1 were stubborn and gave up few samples. Team 2 gave up many, for every digit except 1, which is why we ended up targeting Team 2.</p>
+
+        <p class="phase reveal">Phase 3 · find the generic pattern, score by hit rate</p>
+        <p class="reveal">We suspected each digit had a generic pattern that scores above 0.8 confidence, and it turned out there was one. We built images from those patterns and graded them with a metric we called hit rate. For a digit with many stored samples, an image hits a sample when the pixel difference is under 200, and the hit rate is the fraction of samples it hits. For example, if digit 0 has 9000 samples and one image matches 8000 of them, its hit rate is 8000 out of 9000. We optimised hard, but each digit had a ceiling we could not push past.</p>
+
+        <p class="phase reveal">Phase 4 · split each digit into styles</p>
+        <p class="reveal">The ceiling made sense once we used the hint that each digit might have different styles worth submitting separately. It did. The harder a digit was to generalise, the more styles it carried. We split every digit into 4 styles and brought in one more trusted teammate to cover them. Hit rate was then scored as a hit if any of us matched, and most digits landed between 85% and 95%, which we treated as our real probability of scoring in the competition.</p>
+
+        <div class="note reveal">
+          <span class="tag">Exceptions</span>
+          <p>Two digits broke the pattern. Digit 1 yielded zero usable samples, so we fell back to plain PGD confidence. Digit 2 had too wide a spread for four people to cover, so it also stayed on PGD. Every other digit ran on the style based generation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- A5 -->
+  <section class="strategy" id="a5">
+    <div class="wrap">
+      <div class="s-head reveal">
+        <div class="s-index">05</div>
+        <div class="s-titles">
+          <div class="s-tagrow"><span class="s-tag">A5</span><span class="s-kind">debate agent · embeddings</span></div>
+          <h2>Steer a debate agent by aligning two embedding spaces</h2>
+          <p class="s-sub">weighted nearest neighbour agent, shifted with a calibrated sentence search</p>
+        </div>
+      </div>
+
+      <div class="s-body">
+        <div class="spec reveal">
+          <div class="cell"><span class="k">agent</span><span class="v">weighted kNN + USE</span></div>
+          <div class="cell"><span class="k">alignment</span><span class="v hot">Procrustes 0.891</span></div>
+          <div class="cell"><span class="k">search</span><span class="v">greedy + local swap</span></div>
+          <div class="cell"><span class="k">team</span><span class="v">closed #3</span></div>
+          <div class="cell"><span class="k">fallback</span><span class="v">honest rephrase</span></div>
+        </div>
+
+        <p class="phase reveal">Phase 1 · the two spaces did not line up</p>
+        <p class="reveal">The agent scores submissions in its own Universal Sentence Encoder space, and pulls its opinion toward whichever training sentences a submission sits nearest to. Our locally installed encoder sat in a different space entirely: raw cosine similarity between our embeddings and the agent's was about -0.003, essentially orthogonal. Ranking candidate sentences locally told us nothing until we fixed that.</p>
+
+        <p class="phase reveal">Phase 2 · align with Procrustes</p>
+        <p class="reveal">We learned an orthogonal Procrustes map from the 100 training pairs, which reached 0.891 validation fit. That let us rank sentences in the agent's true space, so a candidate that looked strong for us actually moved the agent rather than landing somewhere random.</p>
+
+        <p class="phase reveal">Phase 3 · what we actually submitted</p>
+        <p class="reveal">The submission strategy shifted several times. We opened with synthetic antipodal vectors aimed straight opposite the agent's prior, then watched teammates and briefly switched to minimal single word adverb edits. Once the professor signalled that longer, complex sentences were preferred, we moved to natural rephrasing that pulls toward the target.</p>
+
+        <p class="phase reveal">Phase 4 · the steer optimiser</p>
+        <p class="reveal">The final version was an optimiser with a single steer control. STEER_ALPHA sets how much of the agent's prior to cancel: 0 aims purely at the target, 1 fully cancels the prior, and values between blend the two. We chose the sentence set with greedy selection plus local swap improvement, which lands near the optimum without an exhaustive search.</p>
+
+        <div class="note reveal">
+          <span class="tag">Insight</span>
+          <p>Q7 hit the 1.0000 ceiling, and the simulator showed roughly 0.99 solo when raw vectors are pasted, against a slower coordination climb when sentences are embedded again. So the honest rephrase stayed as a safe baseline we could always submit, the same fallback logic as A4.</p>
+        </div>
+
+        <div class="note attack reveal">
+          <span class="tag">Coordination</span>
+          <p>Coordination was the real constraint. We kept a shared paraphrase pool so teammates would not collide, which mattered because five of our sentences clashed with theirs and had to be swapped. We targeted closed team 3 for its low penalty. The trial leaderboard pinned around 0.47 to 0.48, but a teammate worked out this was likely a measurement artifact, since the normalised scoring formula returns about 0.97 for similar sentence sets.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="foot-inner">
+    <span><a href="index.html">← back to portfolio</a></span>
+    <span>samved · neural network competition log</span>
+    <span><a href="https://github.com/SamvedVivek">github.com/SamvedVivek</a></span>
+  </div>
+</footer>
+
+<script>
+  document.documentElement.classList.add("js");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* reveal on scroll */
+  (function () {
+    var items = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+    if (reduce || !("IntersectionObserver" in window)) {
+      items.forEach(function (el) { el.classList.add("in"); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+    items.forEach(function (el) { io.observe(el); });
+  })();
+
+  /* scroll progress + active rail */
+  (function () {
+    var bar = document.getElementById("progress");
+    var railLinks = Array.prototype.slice.call(document.querySelectorAll(".rail a"));
+    var sections = ["a1", "a2", "a3", "a4", "a5"].map(function (id) { return document.getElementById(id); });
+    var ticking = false;
+
+    function update() {
+      ticking = false;
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      var pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+      bar.style.width = pct + "%";
+
+      var mid = window.scrollY + window.innerHeight * 0.4;
+      var current = sections[0];
+      sections.forEach(function (s) { if (s && s.offsetTop <= mid) current = s; });
+      railLinks.forEach(function (a) {
+        a.classList.toggle("active", current && a.getAttribute("data-target") === current.id);
+      });
+    }
+    function onScroll() { if (!ticking) { window.requestAnimationFrame(update); ticking = true; } }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+  })();
+
+  /* signature: noise field on a 32 x 16 grid, cycling the trained noise levels */
+  (function () {
+    var canvas = document.getElementById("noise");
+    var readout = document.getElementById("noiseReadout");
+    if (!canvas) return;
+    var ctx = canvas.getContext("2d");
+    var COLS = 32, ROWS = 16;
+    var levels = [];
+    for (var lv = 0; lv <= 100; lv += 5) { levels.push(lv); }
+    var li = 0;
+    var ink = "#13151B", signal = "#2A3CDE";
+
+    function fit() {
+      var ratio = window.devicePixelRatio || 1;
+      var w = canvas.clientWidth, h = 168;
+      canvas.width = Math.floor(w * ratio);
+      canvas.height = Math.floor(h * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      return { w: w, h: h };
+    }
+    function draw(level) {
+      var d = fit(), cw = d.w / COLS, ch = d.h / ROWS;
+      ctx.clearRect(0, 0, d.w, d.h);
+      var density = level / 100;
+      for (var r = 0; r < ROWS; r++) {
+        for (var c = 0; c < COLS; c++) {
+          var noisy = Math.random() < density;
+          if (!noisy && Math.random() > 0.09) continue;
+          var isSignal = noisy && Math.random() < 0.06;
+          ctx.fillStyle = isSignal ? signal : ink;
+          ctx.globalAlpha = noisy ? (0.14 + Math.random() * 0.5) : 0.045;
+          var p = 1.4;
+          ctx.fillRect(c * cw + p, r * ch + p, cw - p * 2, ch - p * 2);
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+    function tick() {
+      var level = levels[li];
+      readout.textContent = String(level).padStart(2, "0");
+      draw(level);
+      li = (li + 1) % levels.length;
+    }
+    if (reduce) { readout.textContent = "50"; draw(50); }
+    else {
+      tick();
+      setInterval(tick, 720);
+      window.addEventListener("resize", function () { draw(levels[(li + levels.length - 1) % levels.length]); });
+    }
+  })();
+</script>
+
+</body>
+</html>

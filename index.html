@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Samved Vivek — Data Scientist</title>
+<meta name="description" content="Samved Vivek: data science and machine learning. Adversarial robustness, forecasting, RAG systems, and models shipped end to end." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #E8E9ED;
+    --paper-2: #E1E3E8;
+    --raised: #FCFCFD;
+    --ink: #13151B;
+    --ink-soft: #525863;
+    --ink-faint: #878D9A;
+    --rule: #D2D5DC;
+    --rule-soft: #E0E2E8;
+    --signal: #2A3CDE;
+    --signal-2: #5766F2;
+    --signal-soft: #E7E9FD;
+    --flag: #9F2340;
+    --flag-soft: #F6E4E9;
+
+    --sh-sm: 0 1px 2px rgba(19,21,27,0.05), 0 1px 1px rgba(19,21,27,0.04);
+    --sh-md: 0 6px 20px -8px rgba(19,21,27,0.14), 0 2px 6px -3px rgba(19,21,27,0.08);
+    --sh-lg: 0 22px 48px -20px rgba(19,21,27,0.28), 0 6px 16px -8px rgba(19,21,27,0.12);
+
+    --display: "Space Grotesk", system-ui, sans-serif;
+    --body: "Inter", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+
+    --wrap: 960px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    background-image:
+      linear-gradient(var(--rule-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-position: -1px -1px;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(120% 55% at 50% -8%, rgba(42,60,222,0.10) 0%, rgba(42,60,222,0) 55%),
+      radial-gradient(ellipse at 50% 40%, rgba(232,233,237,0) 0%, var(--paper) 82%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  a { color: var(--signal); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible, .navlink:focus-visible, .btn:focus-visible {
+    outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 4px;
+  }
+
+  /* nav */
+  header.nav {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(232,233,237,0.82);
+    backdrop-filter: blur(10px) saturate(1.1);
+    border-bottom: 1px solid var(--rule);
+  }
+  .nav-inner {
+    max-width: var(--wrap); margin: 0 auto; padding: 13px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  a.brand { font-family: var(--mono); font-weight: 700; font-size: 14px; letter-spacing: 0.02em; color: var(--ink); text-decoration: none; }
+  a.brand span { color: var(--ink-faint); font-weight: 400; }
+  a.brand:hover, a.brand:hover span { color: var(--signal); text-decoration: none; }
+  .navlinks { display: flex; gap: 2px; flex-wrap: wrap; }
+  .navlink {
+    font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--ink-soft);
+    padding: 5px 10px; border-radius: 6px; transition: background 0.18s, color 0.18s;
+  }
+  .navlink:hover { background: var(--signal-soft); color: var(--signal); text-decoration: none; }
+
+  /* reveal */
+  html.js .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.7s cubic-bezier(.2,.7,.2,1), transform 0.7s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i, 0) * 70ms); }
+  html.js .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+  }
+
+  /* buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 13px; font-weight: 500;
+    padding: 11px 18px; border-radius: 8px; text-decoration: none; transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+  }
+  .btn:hover { text-decoration: none; transform: translateY(-2px); }
+  .btn.primary { background: var(--ink); color: var(--raised); box-shadow: var(--sh-md); }
+  .btn.primary:hover { background: #000; box-shadow: var(--sh-lg); }
+  .btn.ghost { background: var(--raised); color: var(--ink); border: 1px solid var(--rule); box-shadow: var(--sh-sm); }
+  .btn.ghost:hover { border-color: var(--signal); color: var(--signal); }
+
+  /* hero */
+  .hero { padding: 96px 0 60px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--signal); margin: 0 0 20px;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--signal); display: inline-block; }
+  .hero h1 {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(2.8rem, 8vw, 5rem); line-height: 0.98; letter-spacing: -0.03em;
+    margin: 0 0 22px;
+  }
+  .hero .lede { font-size: 1.24rem; color: var(--ink-soft); max-width: 56ch; margin: 0 0 30px; }
+  .hero .lede b { color: var(--ink); font-weight: 600; }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 42px; }
+
+  /* now card */
+  .nowcard {
+    border: 1px solid var(--rule); background: var(--raised); border-radius: 12px;
+    box-shadow: var(--sh-md); overflow: hidden; max-width: 560px;
+  }
+  .nowcard .bar {
+    display: flex; align-items: center; gap: 10px; padding: 11px 16px;
+    border-bottom: 1px solid var(--rule-soft); font-family: var(--mono); font-size: 12px; color: var(--ink-faint); letter-spacing: 0.06em;
+  }
+  .nowcard .live { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 0 rgba(42,60,222,0.5); animation: pulse 2.2s infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(42,60,222,0.45); } 70% { box-shadow: 0 0 0 7px rgba(42,60,222,0); } 100% { box-shadow: 0 0 0 0 rgba(42,60,222,0); } }
+  @media (prefers-reduced-motion: reduce) { .nowcard .live { animation: none; } }
+  .nowcard ul { list-style: none; margin: 0; padding: 14px 16px; font-family: var(--mono); font-size: 13.5px; color: var(--ink); }
+  .nowcard li { display: flex; gap: 10px; padding: 4px 0; }
+  .nowcard li .m { color: var(--signal); }
+
+  /* section scaffolding */
+  section.block { padding: 60px 0; border-top: 1px solid var(--rule); }
+  .sec-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 30px; flex-wrap: wrap; }
+  .sec-num { font-family: var(--mono); font-size: 13px; color: var(--ink-faint); letter-spacing: 0.1em; }
+  .sec-head h2 { font-family: var(--display); font-weight: 600; font-size: clamp(1.5rem, 4vw, 2rem); letter-spacing: -0.02em; margin: 0; }
+  .sec-head .grow { flex: 1; }
+  .sec-head .more { font-family: var(--mono); font-size: 13px; }
+
+  /* featured project */
+  .feature {
+    display: block; border: 1px solid var(--rule); background: var(--raised); border-radius: 14px;
+    padding: 28px; box-shadow: var(--sh-md); margin-bottom: 20px; text-decoration: none; color: inherit;
+    transition: transform 0.2s, box-shadow 0.25s, border-color 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .feature::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(120% 120% at 100% 0%, rgba(42,60,222,0.07), transparent 50%);
+  }
+  .feature:hover { text-decoration: none; transform: translateY(-4px); box-shadow: var(--sh-lg); border-color: var(--signal); }
+  .feature .frow { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .chip { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 9px; border-radius: 5px; }
+  .chip.solid { background: var(--ink); color: var(--raised); }
+  .chip.win { background: var(--signal-soft); color: var(--signal); }
+  .feature h3 { font-family: var(--display); font-weight: 600; font-size: 1.5rem; letter-spacing: -0.015em; margin: 0 0 10px; }
+  .feature p { margin: 0 0 16px; color: var(--ink-soft); max-width: 62ch; }
+  .feature .go { font-family: var(--mono); font-size: 13px; color: var(--signal); font-weight: 500; }
+
+  /* project grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .card {
+    border: 1px solid var(--rule-soft); background: var(--raised); border-radius: 12px; padding: 20px;
+    box-shadow: var(--sh-sm); transition: transform 0.2s, box-shadow 0.2s;
+    display: flex; flex-direction: column;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: var(--sh-md); }
+  .card h3 { font-family: var(--display); font-weight: 600; font-size: 1.14rem; letter-spacing: -0.01em; margin: 0 0 8px; }
+  .card p { margin: 0 0 14px; font-size: 15px; color: var(--ink-soft); flex: 1; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); background: var(--paper-2); border: 1px solid var(--rule-soft); padding: 2px 8px; border-radius: 20px; }
+
+  /* experience / education rows */
+  .row {
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 18px; align-items: baseline;
+    padding: 18px 0; border-bottom: 1px solid var(--rule-soft);
+  }
+  .row:last-child { border-bottom: none; }
+  .row .role { font-family: var(--display); font-weight: 600; font-size: 1.1rem; }
+  .row .org { color: var(--signal); font-weight: 500; }
+  .row .meta { font-family: var(--mono); font-size: 12.5px; color: var(--ink-faint); text-align: right; }
+  .row .desc { grid-column: 1 / -1; color: var(--ink-soft); font-size: 15px; margin-top: 4px; }
+
+  /* skills */
+  .skills { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+  .skillgroup .lbl { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 10px; }
+  .skillgroup .tags .tag { font-size: 12px; padding: 4px 10px; }
+
+  /* about */
+  .about p { max-width: 68ch; margin: 0 0 16px; }
+
+  /* contact */
+  .contact-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  footer { border-top: 1px solid var(--rule); padding: 40px 0 60px; margin-top: 20px; position: relative; z-index: 1; }
+  .foot-inner {
+    max-width: var(--wrap); margin: 0 auto; padding: 0 24px;
+    font-family: var(--mono); font-size: 13px; color: var(--ink-faint);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .nav-inner { padding: 12px 18px; }
+    .row { grid-template-columns: 1fr; }
+    .row .meta { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">samved<span> / portfolio</span></a>
+    <nav class="navlinks" aria-label="Sections">
+      <a class="navlink" href="#work">Work</a>
+      <a class="navlink" href="#experience">Experience</a>
+      <a class="navlink" href="#skills">Skills</a>
+      <a class="navlink" href="#about">About</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow reveal">Data scientist</p>
+    <h1 class="reveal" style="--i:1">Samved Vivek</h1>
+    <p class="lede reveal" style="--i:2">I build machine learning that holds up under <b>noise, adversaries, and messy real data</b>, and I ship models end to end. Data science at UW-Madison, with work across quantitative finance and ML research.</p>
+    <div class="cta reveal" style="--i:3">
+      <a class="btn primary" href="#work">View work</a>
+      <a class="btn ghost" href="competition-log.html">Competition log →</a>
+      <a class="btn ghost" href="https://github.com/SamvedVivek">GitHub</a>
+    </div>
+
+    <div class="nowcard reveal" style="--i:4">
+      <div class="bar"><span class="live"></span> now</div>
+      <ul>
+        <li><span class="m">›</span> Data Scientist intern at Speridian Technologies</li>
+        <li><span class="m">›</span> Final year, Data Science at UW-Madison (CS minor, GPA 3.90)</li>
+        <li><span class="m">›</span> Shipping ML models end to end, from training to deployment</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<main>
+
+  <!-- WORK -->
+  <section class="block" id="work">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">01</span>
+        <h2>Selected work</h2>
+        <span class="grow"></span>
+        <a class="more" href="https://github.com/SamvedVivek">more on GitHub →</a>
+      </div>
+
+      <a class="feature reveal" href="competition-log.html">
+        <div class="frow">
+          <span class="chip solid">Featured</span>
+          <span class="chip win">5 / 5 cleared</span>
+        </div>
+        <h3>Neural Network Competition Log</h3>
+        <p>Five machine learning competitions in adversarial and noise robust classification, cleared in full. Noise robust training, PGD confidence attacks, style clustered digit generation, and aligning two embedding spaces with Procrustes to steer a debate agent. Written up strategy by strategy.</p>
+        <div class="tags" style="margin-bottom:16px">
+          <span class="tag">adversarial ML</span>
+          <span class="tag">PGD</span>
+          <span class="tag">robustness</span>
+          <span class="tag">embeddings</span>
+          <span class="tag">PyTorch</span>
+        </div>
+        <span class="go">Read the write up →</span>
+      </a>
+
+      <div class="grid">
+        <div class="card reveal">
+          <h3>RAG Document Chat</h3>
+          <p>Chat over your own documents with grounded, retrieval backed answers. Built end to end with a vector store and an LLM.</p>
+          <div class="tags">
+            <span class="tag">LangChain</span>
+            <span class="tag">ChromaDB</span>
+            <span class="tag">Claude Haiku</span>
+            <span class="tag">MiniLM</span>
+          </div>
+        </div>
+
+        <div class="card reveal" style="--i:1">
+          <h3>Customer Churn Prediction</h3>
+          <p>A churn model trained and deployed as a live service with an interactive frontend, so predictions run on demand.</p>
+          <div class="tags">
+            <span class="tag">XGBoost</span>
+            <span class="tag">FastAPI</span>
+            <span class="tag">Streamlit</span>
+            <span class="tag">Render</span>
+          </div>
+        </div>
+
+        <div class="card reveal" style="--i:2">
+          <h3>Stock Time Series Forecasting</h3>
+          <p>Forecasting Microsoft stock movement, comparing gradient boosted trees against a dedicated forecasting model.</p>
+          <div class="tags">
+            <span class="tag">XGBoost</span>
+            <span class="tag">Prophet</span>
+            <span class="tag">time series</span>
+          </div>
+        </div>
+
+        <div class="card reveal" style="--i:3">
+          <h3>Image Denoising</h3>
+          <p>A convolutional denoiser trained on real world sensor noise, recovering clean images from noisy captures.</p>
+          <div class="tags">
+            <span class="tag">DnCNN</span>
+            <span class="tag">Conv2D</span>
+            <span class="tag">SIDD</span>
+          </div>
+        </div>
+
+        <div class="card reveal" style="--i:4">
+          <h3>Crash Resistant Portfolio Model</h3>
+          <p>A portfolio construction model built to hold its footing through market downturns rather than only in calm periods.</p>
+          <div class="tags">
+            <span class="tag">quant finance</span>
+            <span class="tag">optimisation</span>
+            <span class="tag">risk</span>
+          </div>
+        </div>
+
+        <div class="card reveal" style="--i:5">
+          <h3>Fandango Rating Inflation</h3>
+          <p>A statistical study of whether a film ratings site inflates its scores, using hypothesis testing in R.</p>
+          <div class="tags">
+            <span class="tag">R</span>
+            <span class="tag">t-tests</span>
+            <span class="tag">statistics</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="block" id="experience">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">02</span>
+        <h2>Experience</h2>
+      </div>
+
+      <div class="reveal">
+        <div class="row">
+          <div class="role">Data Scientist Intern <span class="org">· Speridian Technologies</span></div>
+          <div class="meta">current</div>
+          <div class="desc">Applying machine learning to real business data as part of the data science team.</div>
+        </div>
+        <div class="row">
+          <div class="role">Financial Quantitative Analyst <span class="org">· Shepherd Ventures</span></div>
+          <div class="meta">prior</div>
+          <div class="desc">Quantitative modelling and analysis in a venture and investment setting.</div>
+        </div>
+        <div class="row">
+          <div class="role">ML Research Assistant <span class="org">· MIT Manipal</span></div>
+          <div class="meta">prior</div>
+          <div class="desc">Research work on machine learning methods and experiments.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section class="block" id="education">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">03</span>
+        <h2>Education</h2>
+      </div>
+
+      <div class="reveal">
+        <div class="row">
+          <div class="role">University of Wisconsin–Madison</div>
+          <div class="meta">GPA 3.90</div>
+          <div class="desc">B.S. Data Science, minor in Computer Science.</div>
+        </div>
+        <div class="row">
+          <div class="role">Manipal Institute of Technology</div>
+          <div class="meta"></div>
+          <div class="desc">B.S.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="block" id="skills">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">04</span>
+        <h2>Toolbox</h2>
+      </div>
+
+      <div class="skills reveal">
+        <div class="skillgroup">
+          <div class="lbl">Languages</div>
+          <div class="tags">
+            <span class="tag">Python</span>
+            <span class="tag">R</span>
+            <span class="tag">MATLAB</span>
+            <span class="tag">SQL</span>
+          </div>
+        </div>
+        <div class="skillgroup">
+          <div class="lbl">ML &amp; deep learning</div>
+          <div class="tags">
+            <span class="tag">PyTorch</span>
+            <span class="tag">XGBoost</span>
+            <span class="tag">scikit-learn</span>
+            <span class="tag">CNNs</span>
+            <span class="tag">PCA</span>
+            <span class="tag">K-means</span>
+          </div>
+        </div>
+        <div class="skillgroup">
+          <div class="lbl">LLMs &amp; RAG</div>
+          <div class="tags">
+            <span class="tag">LangChain</span>
+            <span class="tag">ChromaDB</span>
+            <span class="tag">Claude</span>
+            <span class="tag">embeddings</span>
+          </div>
+        </div>
+        <div class="skillgroup">
+          <div class="lbl">Deploy &amp; data</div>
+          <div class="tags">
+            <span class="tag">FastAPI</span>
+            <span class="tag">Streamlit</span>
+            <span class="tag">Render</span>
+            <span class="tag">Prophet</span>
+            <span class="tag">pandas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="block about" id="about">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">05</span>
+        <h2>About</h2>
+      </div>
+      <div class="reveal">
+        <p>I am a final year Data Science student at UW-Madison with a Computer Science minor, after a B.S. from Manipal Institute of Technology. My work spans data science, quantitative finance, and ML research, and I am drawn to the messy edge of machine learning, where models meet noise, adversaries, and data that does not behave.</p>
+        <p>I like taking a problem all the way through: framing it, building the model, and getting it deployed where people can actually use it. The projects above are where that shows up in practice.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="block" id="contact">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">06</span>
+        <h2>Get in touch</h2>
+      </div>
+      <div class="contact-row reveal">
+        <a class="btn primary" href="mailto:samvedvivek1@gmail.com">Email</a>
+        <a class="btn ghost" href="https://github.com/SamvedVivek">GitHub</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="foot-inner">
+    <span>samved vivek · data scientist</span>
+    <span><a href="https://github.com/SamvedVivek">github.com/SamvedVivek</a></span>
+  </div>
+</footer>
+
+<script>
+  document.documentElement.classList.add("js");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  (function () {
+    var items = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+    if (reduce || !("IntersectionObserver" in window)) {
+      items.forEach(function (el) { el.classList.add("in"); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+    items.forEach(function (el) { io.observe(el); });
+  })();
+</script>
+
+</body>
+</html>
