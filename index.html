@@ -10,29 +10,25 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --paper: #E8E9ED;
-    --paper-2: #E1E3E8;
-    --raised: #FCFCFD;
-    --ink: #13151B;
-    --ink-soft: #525863;
-    --ink-faint: #878D9A;
-    --rule: #D2D5DC;
-    --rule-soft: #E0E2E8;
-    --signal: #2A3CDE;
-    --signal-2: #5766F2;
-    --signal-soft: #E7E9FD;
-    --flag: #9F2340;
-    --flag-soft: #F6E4E9;
-
-    --sh-sm: 0 1px 2px rgba(19,21,27,0.05), 0 1px 1px rgba(19,21,27,0.04);
-    --sh-md: 0 6px 20px -8px rgba(19,21,27,0.14), 0 2px 6px -3px rgba(19,21,27,0.08);
-    --sh-lg: 0 22px 48px -20px rgba(19,21,27,0.28), 0 6px 16px -8px rgba(19,21,27,0.12);
+    --bg: #08090E;
+    --panel: rgba(255,255,255,0.04);
+    --panel-2: rgba(255,255,255,0.065);
+    --ink: #ECEEF4;
+    --ink-soft: #9AA1B0;
+    --ink-faint: #646B7C;
+    --line: rgba(255,255,255,0.055);
+    --border: rgba(255,255,255,0.10);
+    --border-2: rgba(255,255,255,0.18);
+    --signal: #7C8CFF;
+    --signal-2: #A98BFF;
+    --cyan: #53D8E6;
+    --flag: #FF6585;
+    --glow: rgba(124,140,255,0.55);
 
     --display: "Space Grotesk", system-ui, sans-serif;
     --body: "Inter", system-ui, sans-serif;
     --mono: "JetBrains Mono", ui-monospace, monospace;
-
-    --side: 340px;
+    --side: 360px;
   }
 
   * { box-sizing: border-box; }
@@ -41,227 +37,217 @@
 
   body {
     margin: 0;
-    background: var(--paper);
+    background: var(--bg);
     color: var(--ink);
     font-family: var(--body);
     font-size: 16px;
-    line-height: 1.62;
+    line-height: 1.64;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
-    background-image:
-      linear-gradient(var(--rule-soft) 1px, transparent 1px),
-      linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px);
-    background-size: 28px 28px;
-    background-position: -1px -1px;
   }
+  /* faint glowing grid + vignette */
+  .bgfx { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .bgfx .grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 40px 40px;
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 20%, #000 40%, transparent 85%);
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 20%, #000 40%, transparent 85%);
+  }
+  .bgfx .aurora { position: absolute; inset: 0; overflow: hidden; }
+  .bgfx .aurora span { position: absolute; width: 60vmax; height: 60vmax; border-radius: 50%; filter: blur(70px); opacity: 0.55; }
+  .bgfx .aurora .a1 { background: radial-gradient(circle, rgba(124,140,255,0.5), transparent 60%); top: -24vmax; left: -12vmax; animation: drift1 26s ease-in-out infinite alternate; }
+  .bgfx .aurora .a2 { background: radial-gradient(circle, rgba(169,139,255,0.42), transparent 60%); bottom: -28vmax; right: -14vmax; animation: drift2 32s ease-in-out infinite alternate; }
+  .bgfx .aurora .a3 { background: radial-gradient(circle, rgba(83,216,230,0.22), transparent 60%); top: 30%; right: 8%; animation: drift3 38s ease-in-out infinite alternate; }
+  @keyframes drift1 { to { transform: translate(16vmax, 10vmax) scale(1.2); } }
+  @keyframes drift2 { to { transform: translate(-12vmax, -8vmax) scale(1.15); } }
+  @keyframes drift3 { to { transform: translate(-8vmax, 6vmax) scale(1.25); } }
+  #net { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.75; }
+  .bgfx .vignette { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, transparent 40%, rgba(6,7,11,0.6) 100%); }
 
   a { color: var(--signal); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-  a:focus-visible, .navlink:focus-visible, .btn:focus-visible {
-    outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 4px;
-  }
+  a:hover { text-decoration: none; color: #A9B4FF; }
+  a:focus-visible, .navlink:focus-visible, .btn:focus-visible, .desk-nav a:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 6px; }
 
-  /* reveal */
-  html.js .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s cubic-bezier(.2,.7,.2,1), transform 0.6s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i, 0) * 60ms); }
-  html.js .reveal.in { opacity: 1; transform: none; }
-  @media (prefers-reduced-motion: reduce) {
-    html.js .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
-  }
+  .grad { background: linear-gradient(104deg, var(--ink) 8%, var(--signal) 54%, var(--signal-2) 96%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
 
-  /* shared buttons */
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    font-family: var(--mono); font-size: 13px; font-weight: 500;
-    padding: 11px 16px; border-radius: 9px; text-decoration: none;
-    transition: transform 0.15s, box-shadow 0.2s, background 0.2s, border-color 0.2s;
-  }
-  .btn:hover { text-decoration: none; transform: translateY(-2px); }
-  .btn.primary { background: var(--ink); color: var(--raised); box-shadow: var(--sh-md); }
-  .btn.primary:hover { background: #000; box-shadow: var(--sh-lg); }
-  .btn.ghost { background: var(--raised); color: var(--ink); border: 1px solid var(--rule); box-shadow: var(--sh-sm); }
-  .btn.ghost:hover { border-color: var(--signal); color: var(--signal); }
+  html.js .reveal { opacity: 0; transform: translateY(20px); filter: blur(8px); transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1), filter .7s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i,0) * 70ms); }
+  html.js .reveal.in { opacity: 1; transform: none; filter: blur(0); }
+  @media (prefers-reduced-motion: reduce) { html.js .reveal { opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; } .bgfx .aurora span { animation: none !important; } .grad-anim { animation: none !important; } }
 
-  /* live dot */
-  .live { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 0 rgba(42,60,222,0.5); animation: pulse 2.2s infinite; flex: none; }
-  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(42,60,222,0.45); } 70% { box-shadow: 0 0 0 7px rgba(42,60,222,0); } 100% { box-shadow: 0 0 0 0 rgba(42,60,222,0); } }
+  /* buttons */
+  .btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--mono); font-size: 13px; font-weight: 500; padding: 12px 18px; border-radius: 11px; text-decoration: none; transition: transform .18s cubic-bezier(.2,.7,.2,1), box-shadow .25s, border-color .2s, background .2s; will-change: transform; }
+  .btn.primary { background: linear-gradient(100deg, var(--signal), var(--signal-2)); color: #0A0B12; font-weight: 700; box-shadow: 0 8px 30px -8px var(--glow); }
+  .btn.primary:hover { box-shadow: 0 14px 44px -10px var(--glow); color: #0A0B12; }
+  .btn.ghost { background: var(--panel); color: var(--ink); border: 1px solid var(--border); backdrop-filter: blur(10px); }
+  .btn.ghost:hover { border-color: var(--signal); color: #fff; box-shadow: 0 0 30px -10px var(--glow); }
+
+  .live { width: 7px; height: 7px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 10px 1px var(--signal); animation: pulse 2.2s infinite; flex: none; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(124,140,255,0.6), 0 0 10px 1px var(--signal); } 70% { box-shadow: 0 0 0 8px rgba(124,140,255,0), 0 0 10px 1px var(--signal); } 100% { box-shadow: 0 0 0 0 rgba(124,140,255,0), 0 0 10px 1px var(--signal); } }
   @media (prefers-reduced-motion: reduce) { .live { animation: none; } }
 
-  /* now card (shared component, placed in both designs) */
-  .nowcard { border: 1px solid var(--rule); background: var(--raised); border-radius: 12px; box-shadow: var(--sh-md); overflow: hidden; }
-  .nowcard .bar { display: flex; align-items: center; gap: 9px; padding: 10px 14px; border-bottom: 1px solid var(--rule-soft); font-family: var(--mono); font-size: 11.5px; color: var(--ink-faint); letter-spacing: 0.08em; }
-  .nowcard ul { list-style: none; margin: 0; padding: 12px 14px; font-family: var(--mono); font-size: 12.5px; color: var(--ink); line-height: 1.5; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--signal); margin: 0 0 16px; display: inline-flex; align-items: center; gap: 10px; }
+  .eyebrow::before { content: ""; width: 24px; height: 1px; background: linear-gradient(90deg, var(--signal), transparent); }
+
+  /* now card (glass) */
+  .nowcard { border: 1px solid var(--border); background: var(--panel); border-radius: 14px; overflow: hidden; backdrop-filter: blur(14px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
+  .nowcard .bar { display: flex; align-items: center; gap: 9px; padding: 11px 15px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 11.5px; color: var(--ink-faint); letter-spacing: 0.08em; }
+  .nowcard ul { list-style: none; margin: 0; padding: 13px 15px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft); line-height: 1.55; }
   .nowcard li { display: flex; gap: 9px; padding: 4px 0; }
   .nowcard li .m { color: var(--signal); }
+  .nowcard li b { color: var(--ink); font-weight: 600; }
 
-  /* eyebrow */
-  .eyebrow { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--signal); margin: 0 0 16px; display: inline-flex; align-items: center; gap: 10px; }
-  .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--signal); display: inline-block; }
-
-  /* ============================================================
-     SHARED CONTENT SECTIONS (styled differently per breakpoint)
-     ============================================================ */
-  .sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-  .sec-num { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); letter-spacing: 0.1em; }
-  .sec-head h2 { font-family: var(--display); font-weight: 600; letter-spacing: -0.02em; margin: 0; font-size: 1.5rem; }
+  /* section headers with big numerals */
+  .sec-head { display: flex; align-items: flex-end; gap: 18px; margin-bottom: 34px; padding-bottom: 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .sec-index { font-family: var(--display); font-weight: 700; font-size: clamp(2.3rem, 5vw, 3.3rem); line-height: 0.72; color: transparent; -webkit-text-stroke: 1px var(--border-2); letter-spacing: -0.03em; }
+  .sec-head h2 { font-family: var(--display); font-weight: 600; font-size: clamp(1.5rem, 3.6vw, 2rem); letter-spacing: -0.02em; margin: 0; }
   .sec-head .grow { flex: 1; }
-  .sec-head .more { font-family: var(--mono); font-size: 12.5px; }
+  .sec-head .more { font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft); }
+  .sec-head .more:hover { color: var(--signal); }
 
-  .feature {
-    display: block; border: 1px solid var(--rule); background: var(--raised); border-radius: 14px;
-    padding: 24px; box-shadow: var(--sh-md); margin-bottom: 18px; text-decoration: none; color: inherit;
-    transition: transform 0.2s, box-shadow 0.25s, border-color 0.2s; position: relative; overflow: hidden;
-  }
-  .feature::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 120% at 100% 0%, rgba(42,60,222,0.07), transparent 50%); }
-  .feature:hover { text-decoration: none; transform: translateY(-4px); box-shadow: var(--sh-lg); border-color: var(--signal); }
-  .feature .frow { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-  .chip { font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 9px; border-radius: 5px; }
-  .chip.solid { background: var(--ink); color: var(--raised); }
-  .chip.win { background: var(--signal-soft); color: var(--signal); }
-  .feature h3 { font-family: var(--display); font-weight: 600; font-size: 1.4rem; letter-spacing: -0.015em; margin: 0 0 10px; }
-  .feature p { margin: 0 0 14px; color: var(--ink-soft); }
+  /* featured */
+  .feature { position: relative; display: block; border: 1px solid var(--border); background: var(--panel); border-radius: 18px; padding: 30px; overflow: hidden; text-decoration: none; color: inherit; backdrop-filter: blur(14px); transition: transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .3s, border-color .25s; margin-bottom: 18px; }
+  .feature .spot { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity .3s; background: radial-gradient(340px circle at var(--mx,50%) var(--my,50%), rgba(124,140,255,0.16), transparent 60%); pointer-events: none; }
+  .feature .accent { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--signal), var(--signal-2), transparent); background-size: 200% 100%; opacity: 0.9; animation: flow 6s linear infinite; }
+  @keyframes flow { to { background-position: 200% 0; } }
+  .feature > *:not(.spot):not(.accent) { position: relative; z-index: 1; }
+  .feature:hover { transform: translateY(-5px); border-color: var(--border-2); box-shadow: 0 30px 70px -30px rgba(0,0,0,0.85), 0 0 60px -22px var(--glow); }
+  .feature:hover .spot { opacity: 1; }
+  .feature .frow { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .chip { font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; }
+  .chip.solid { background: linear-gradient(100deg, var(--signal), var(--signal-2)); color: #0A0B12; }
+  .chip.win { background: rgba(124,140,255,0.14); color: #B7C0FF; border: 1px solid rgba(124,140,255,0.3); }
+  .feature h3 { font-family: var(--display); font-weight: 600; font-size: 1.65rem; letter-spacing: -0.02em; margin: 0 0 12px; }
+  .feature p { margin: 0 0 16px; color: var(--ink-soft); max-width: 60ch; }
   .feature .go { font-family: var(--mono); font-size: 12.5px; color: var(--signal); font-weight: 500; }
 
-  .grid { display: grid; gap: 14px; }
-  .card { border: 1px solid var(--rule-soft); background: var(--raised); border-radius: 12px; padding: 18px; box-shadow: var(--sh-sm); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
-  .card:hover { transform: translateY(-3px); box-shadow: var(--sh-md); }
-  .card h3 { font-family: var(--display); font-weight: 600; font-size: 1.1rem; letter-spacing: -0.01em; margin: 0 0 8px; }
-  .card p { margin: 0 0 12px; font-size: 14.5px; color: var(--ink-soft); flex: 1; }
+  /* project grid */
+  .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+  .card { position: relative; border: 1px solid var(--border); background: var(--panel); border-radius: 15px; padding: 20px; overflow: hidden; backdrop-filter: blur(12px); transition: transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .3s, border-color .25s; display: flex; flex-direction: column; }
+  .card .spot { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity .3s; background: radial-gradient(240px circle at var(--mx,50%) var(--my,50%), rgba(124,140,255,0.14), transparent 60%); pointer-events: none; }
+  .card > *:not(.spot) { position: relative; z-index: 1; }
+  .card:hover { transform: translateY(-5px); border-color: var(--border-2); box-shadow: 0 26px 60px -30px rgba(0,0,0,0.85), 0 0 48px -20px var(--glow); }
+  .card:hover .spot { opacity: 1; }
+  .card h3 { font-family: var(--display); font-weight: 600; font-size: 1.16rem; letter-spacing: -0.01em; margin: 0 0 8px; }
+  .card p { margin: 0 0 14px; font-size: 14.5px; color: var(--ink-soft); flex: 1; }
   .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .tag { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); background: var(--paper-2); border: 1px solid var(--rule-soft); padding: 2px 8px; border-radius: 20px; }
+  .tag { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); background: rgba(255,255,255,0.04); border: 1px solid var(--border); padding: 3px 9px; border-radius: 20px; }
 
-  .row { display: grid; grid-template-columns: 1fr; gap: 3px; padding: 16px 0; border-bottom: 1px solid var(--rule-soft); }
+  /* rows */
+  .row { display: grid; grid-template-columns: 1fr; gap: 3px; padding: 18px 0; border-bottom: 1px solid var(--line); }
   .row:last-child { border-bottom: none; }
-  .row .role { font-family: var(--display); font-weight: 600; font-size: 1.06rem; }
+  .row .role { font-family: var(--display); font-weight: 600; font-size: 1.1rem; }
   .row .org { color: var(--signal); font-weight: 500; }
   .row .meta { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
   .row .desc { color: var(--ink-soft); font-size: 14.5px; margin-top: 3px; }
 
   .skills { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  .skillgroup .lbl { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 9px; }
+  .skillgroup .lbl { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 10px; }
 
-  .about p { margin: 0 0 14px; color: var(--ink); }
+  .about p { margin: 0 0 15px; color: var(--ink); }
+  .about p b { color: #fff; }
   .contact-row { display: flex; gap: 10px; flex-wrap: wrap; }
 
-  /* ============================================================
-     MOBILE DESIGN  (default, < 860px) — app-like single column
-     ============================================================ */
+  /* ===== MOBILE (default) ===== */
   .desk-side { display: none; }
+  .mob-nav { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; background: rgba(8,9,14,0.72); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); }
+  a.brand { font-family: var(--mono); font-weight: 700; font-size: 14px; color: var(--ink); }
+  a.brand span { color: var(--ink-faint); font-weight: 400; }
+  a.brand:hover { color: var(--signal); }
+  .mob-nav a.log { font-family: var(--mono); font-size: 12px; color: var(--signal); padding: 7px 11px; border: 1px solid var(--border); border-radius: 9px; background: var(--panel); }
+  .mob-nav a.log:hover { border-color: var(--signal); box-shadow: 0 0 24px -10px var(--glow); }
 
-  .mob-nav {
-    position: sticky; top: 0; z-index: 40;
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 12px 18px;
-    background: rgba(232,233,237,0.86); backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--rule);
-  }
-  .mob-nav .brand { font-family: var(--mono); font-weight: 700; font-size: 14px; color: var(--ink); }
-  .mob-nav .brand span { color: var(--ink-faint); font-weight: 400; }
-  .mob-nav a.log { font-family: var(--mono); font-size: 12px; color: var(--signal); padding: 6px 10px; border: 1px solid var(--rule); border-radius: 7px; background: var(--raised); }
-  .mob-nav a.log:hover { text-decoration: none; border-color: var(--signal); }
-
-  .mob-hero { padding: 40px 22px 26px; }
-  .mob-hero h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.4rem, 12vw, 3.2rem); line-height: 0.98; letter-spacing: -0.03em; margin: 0 0 16px; }
-  .mob-hero .lede { font-size: 1.08rem; color: var(--ink-soft); margin: 0 0 22px; }
-  .mob-hero .lede b { color: var(--ink); font-weight: 600; }
-  .mob-hero .cta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+  .mob-hero { padding: 48px 22px 26px; }
+  .mob-hero h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.6rem, 13vw, 3.6rem); line-height: 0.96; letter-spacing: -0.035em; margin: 0 0 18px; }
+  .mob-hero .lede { font-size: 1.1rem; color: var(--ink-soft); margin: 0 0 24px; }
+  .mob-hero .lede b { color: #fff; font-weight: 600; }
+  .mob-hero .cta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 26px; }
   .mob-hero .cta .btn { width: 100%; }
   .mob-hero .cta .btn.full { grid-column: 1 / -1; }
 
-  .content { }
+  .content { position: relative; z-index: 1; }
   .m-wrap { padding: 0 22px; }
-  section.block { padding: 34px 0; border-top: 1px solid var(--rule); }
-  .grid { grid-template-columns: 1fr; }
+  section.block { padding: 38px 0; }
+  section.block + section.block { border-top: 1px solid var(--line); }
 
-  footer { border-top: 1px solid var(--rule); padding: 30px 22px 48px; margin-top: 12px; }
+  footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 32px 22px 50px; margin-top: 16px; }
   .foot-inner { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); display: flex; flex-direction: column; gap: 8px; }
 
-  /* ============================================================
-     DESKTOP DESIGN  (>= 860px) — fixed sidebar + wide content
-     ============================================================ */
-  @media (min-width: 860px) {
+  /* ===== DESKTOP (>= 900px) ===== */
+  @media (min-width: 900px) {
     body { font-size: 17px; }
-
     .mob-nav, .mob-hero { display: none; }
 
-    .desk-side {
-      display: flex; flex-direction: column;
-      position: fixed; top: 0; left: 0; width: var(--side); height: 100vh;
-      padding: 46px 34px; overflow-y: auto;
-      background: linear-gradient(180deg, var(--raised), #F3F4F7);
-      border-right: 1px solid var(--rule);
-      z-index: 20;
-    }
-    .desk-side .brandline { font-family: var(--mono); font-size: 13px; color: var(--ink-faint); letter-spacing: 0.04em; margin-bottom: 26px; }
+    .desk-side { display: flex; flex-direction: column; position: fixed; top: 0; left: 0; width: var(--side); height: 100vh; padding: 46px 34px; overflow-y: auto; z-index: 20; border-right: 1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01)); backdrop-filter: blur(16px); }
+    .desk-side::-webkit-scrollbar { width: 0; }
+    .desk-side .brandline { font-family: var(--mono); font-size: 13px; color: var(--ink-faint); letter-spacing: 0.04em; margin-bottom: 28px; }
     .desk-side .brandline b { color: var(--ink); font-weight: 700; }
-    .desk-side h1 { font-family: var(--display); font-weight: 700; font-size: 2.5rem; line-height: 0.98; letter-spacing: -0.03em; margin: 0 0 14px; }
+    .desk-side h1 { font-family: var(--display); font-weight: 700; font-size: 2.7rem; line-height: 0.96; letter-spacing: -0.035em; margin: 0 0 16px; }
     .desk-side .lede { font-size: 1.02rem; color: var(--ink-soft); margin: 0 0 26px; }
-    .desk-side .lede b { color: var(--ink); font-weight: 600; }
+    .desk-side .lede b { color: #fff; font-weight: 600; }
 
-    .desk-nav { display: flex; flex-direction: column; gap: 2px; margin-bottom: 26px; }
-    .desk-nav a {
-      font-family: var(--mono); font-size: 13px; color: var(--ink-soft);
-      padding: 7px 10px; border-radius: 7px; display: flex; align-items: center; gap: 10px;
-      transition: background 0.18s, color 0.18s;
-    }
-    .desk-nav a::before { content: ""; width: 14px; height: 1px; background: var(--rule); transition: width 0.2s, background 0.2s; }
-    .desk-nav a:hover { background: var(--signal-soft); color: var(--signal); text-decoration: none; }
-    .desk-nav a:hover::before { width: 22px; background: var(--signal); }
+    .desk-nav { display: flex; flex-direction: column; gap: 3px; margin-bottom: 26px; }
+    .desk-nav a { font-family: var(--mono); font-size: 13px; color: var(--ink-soft); padding: 8px 12px; border-radius: 9px; display: flex; align-items: center; gap: 11px; transition: background .18s, color .18s, box-shadow .2s; }
+    .desk-nav a::before { content: ""; width: 14px; height: 1px; background: var(--border-2); transition: width .2s, background .2s, box-shadow .2s; }
+    .desk-nav a:hover { background: var(--panel); color: #fff; }
+    .desk-nav a:hover::before { width: 24px; background: var(--signal); box-shadow: 0 0 10px var(--signal); }
 
-    .desk-side .nowcard { margin-bottom: 22px; }
-
-    .side-contact { display: flex; flex-direction: column; gap: 9px; margin-top: auto; }
+    .side-contact { display: flex; flex-direction: column; gap: 9px; margin-top: auto; padding-top: 22px; }
     .side-contact .btn { width: 100%; }
 
-    /* content area to the right of the sidebar */
     .content { margin-left: var(--side); }
-    .m-wrap { padding: 0; }
-    .d-wrap { max-width: 860px; margin: 0 auto; padding: 0 56px; }
-    section.block { padding: 64px 0; border-top: 1px solid var(--rule); }
-    section.block:first-child { border-top: none; padding-top: 72px; }
+    .d-wrap { max-width: 880px; margin: 0 auto; padding: 0 56px; }
+    section.block { padding: 70px 0; }
+    section.block:first-child { padding-top: 78px; }
+    section.block + section.block { border-top: 1px solid var(--line); }
 
-    .sec-head h2 { font-size: 1.9rem; }
-
-    .feature { padding: 30px; }
-    .feature h3 { font-size: 1.7rem; }
-    .feature p { max-width: 60ch; }
-
-    /* two column project grid on desktop */
+    .sec-index { font-size: 3.6rem; }
+    .sec-head h2 { font-size: 2rem; }
+    .feature { padding: 34px; }
+    .feature h3 { font-size: 1.9rem; }
     .grid { grid-template-columns: 1fr 1fr; gap: 18px; }
-
-    /* two column rows on desktop */
     .row { grid-template-columns: 1fr auto; gap: 4px 20px; align-items: baseline; }
-    .row .role { font-size: 1.15rem; }
+    .row .role { font-size: 1.16rem; }
     .row .meta { text-align: right; }
     .row .desc { grid-column: 1 / -1; }
-
     .skills { grid-template-columns: repeat(4, 1fr); gap: 22px; }
-
     .about p { max-width: 66ch; }
 
-    footer { margin-left: var(--side); border-top: 1px solid var(--rule); padding: 0; }
-    .foot-inner { max-width: 860px; margin: 0 auto; padding: 34px 56px 54px; flex-direction: row; justify-content: space-between; }
+    footer { margin-left: var(--side); border-top: 1px solid var(--border); padding: 0; }
+    .foot-inner { max-width: 880px; margin: 0 auto; padding: 34px 56px 56px; flex-direction: row; justify-content: space-between; }
   }
+  @media (min-width: 1280px) { :root { --side: 400px; } .d-wrap { max-width: 960px; } .grid { grid-template-columns: repeat(3, 1fr); } .foot-inner { max-width: 960px; } }
+  /* ===== creative upgrades ===== */
+  .cursor-glow { position: fixed; top: 0; left: 0; width: 440px; height: 440px; border-radius: 50%; transform: translate(-50%,-50%); pointer-events: none; z-index: 3; opacity: 0; transition: opacity .5s; background: radial-gradient(circle, rgba(124,140,255,0.10), rgba(169,139,255,0.05) 42%, transparent 62%); mix-blend-mode: screen; }
+  @media (pointer: coarse) { .cursor-glow { display: none; } }
 
-  /* wider desktops: roomier sidebar + three column projects */
-  @media (min-width: 1200px) {
-    :root { --side: 380px; }
-    .d-wrap { max-width: 940px; }
-    .grid { grid-template-columns: repeat(3, 1fr); }
-    .foot-inner { max-width: 940px; }
-  }
+  @property --ring { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
+  .feature::after { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; z-index: 2; pointer-events: none; opacity: 0; transition: opacity .45s; background: conic-gradient(from var(--ring, 0deg), transparent 0deg, var(--signal) 55deg, var(--signal-2) 110deg, transparent 165deg, transparent 360deg); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); mask-composite: exclude; animation: ringspin 5s linear infinite; }
+  .feature:hover::after { opacity: 1; }
+  @keyframes ringspin { to { --ring: 360deg; } }
+
+  @media (prefers-reduced-motion: reduce) { .cursor-glow { display: none; } .feature::after { animation: none; } }
 </style>
 </head>
 <body>
 
-<!-- ===================== MOBILE CHROME ===================== -->
+<div class="bgfx" aria-hidden="true">
+  <canvas id="net"></canvas>
+  <div class="aurora"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
+  <div class="grid"></div>
+  <div class="vignette"></div>
+</div>
+<div class="cursor-glow" aria-hidden="true"></div>
+
+<!-- MOBILE CHROME -->
 <header class="mob-nav">
-  <span class="brand">samved<span> / portfolio</span></span>
+  <a class="brand" href="index.html">samved<span> / portfolio</span></a>
   <a class="log" href="competition-log.html">Competition log</a>
 </header>
 
 <section class="mob-hero">
   <p class="eyebrow reveal">Data scientist</p>
-  <h1 class="reveal" style="--i:1">Samved Vivek</h1>
+  <h1 class="reveal grad decode" style="--i:1">Samved Vivek</h1>
   <p class="lede reveal" style="--i:2">Machine learning that holds up under <b>noise, adversaries, and messy real data</b>, shipped end to end. Data science at UW-Madison, with work across quant finance and ML research.</p>
   <div class="cta reveal" style="--i:3">
     <a class="btn primary full" href="competition-log.html">View the competition log →</a>
@@ -271,20 +257,19 @@
   <div class="nowcard reveal" style="--i:4">
     <div class="bar"><span class="live"></span> now</div>
     <ul>
-      <li><span class="m">›</span> Data Scientist intern at Speridian Technologies</li>
-      <li><span class="m">›</span> Final year, Data Science at UW-Madison (CS minor, GPA 3.90)</li>
-      <li><span class="m">›</span> Shipping ML models from training to deployment</li>
+      <li><span class="m">›</span> <span>Data Scientist intern at <b>Speridian Technologies</b></span></li>
+      <li><span class="m">›</span> <span>Final year, Data Science at <b>UW-Madison</b> (CS minor, GPA 3.90)</span></li>
+      <li><span class="m">›</span> <span>Shipping ML models from training to deployment</span></li>
     </ul>
   </div>
 </section>
 
-<!-- ===================== DESKTOP CHROME ===================== -->
+<!-- DESKTOP CHROME -->
 <aside class="desk-side">
   <div class="brandline"><b>samved</b> / portfolio</div>
-  <h1>Samved Vivek</h1>
+  <h1 class="grad decode">Samved Vivek</h1>
   <p class="eyebrow">Data scientist</p>
   <p class="lede">Machine learning that holds up under <b>noise, adversaries, and messy real data</b>, shipped end to end.</p>
-
   <nav class="desk-nav" aria-label="Sections">
     <a href="#work">Selected work</a>
     <a href="#experience">Experience</a>
@@ -292,16 +277,14 @@
     <a href="#skills">Toolbox</a>
     <a href="#about">About</a>
   </nav>
-
   <div class="nowcard">
     <div class="bar"><span class="live"></span> now</div>
     <ul>
-      <li><span class="m">›</span> Intern at Speridian Technologies</li>
-      <li><span class="m">›</span> Final year at UW-Madison</li>
-      <li><span class="m">›</span> Shipping ML end to end</li>
+      <li><span class="m">›</span> <span>Intern at <b>Speridian</b></span></li>
+      <li><span class="m">›</span> <span>Final year at <b>UW-Madison</b></span></li>
+      <li><span class="m">›</span> <span>Shipping ML end to end</span></li>
     </ul>
   </div>
-
   <div class="side-contact">
     <a class="btn primary" href="competition-log.html">Competition log →</a>
     <a class="btn ghost" href="mailto:samvedvivek1@gmail.com">Email</a>
@@ -309,64 +292,55 @@
   </div>
 </aside>
 
-<!-- ===================== SHARED CONTENT ===================== -->
 <main class="content">
-  <div class="m-wrap d-wrap-holder">
+  <div class="m-wrap">
 
   <!-- WORK -->
   <section class="block" id="work">
     <div class="d-wrap">
       <div class="sec-head reveal">
-        <span class="sec-num">01</span>
+        <span class="sec-index">01</span>
         <h2>Selected work</h2>
         <span class="grow"></span>
         <a class="more" href="https://github.com/SamvedVivek">more on GitHub →</a>
       </div>
 
       <a class="feature reveal" href="competition-log.html">
-        <div class="frow">
-          <span class="chip solid">Featured</span>
-          <span class="chip win">5 / 5 cleared</span>
-        </div>
+        <span class="spot"></span><span class="accent grad-anim"></span>
+        <div class="frow"><span class="chip solid">Featured</span><span class="chip win">5 / 5 cleared</span></div>
         <h3>Neural Network Competition Log</h3>
         <p>Five machine learning competitions in adversarial and noise robust classification, cleared in full. Noise robust training, PGD confidence attacks, style clustered digit generation, and aligning two embedding spaces with Procrustes to steer a debate agent. Written up strategy by strategy.</p>
-        <div class="tags" style="margin-bottom:16px">
-          <span class="tag">adversarial ML</span>
-          <span class="tag">PGD</span>
-          <span class="tag">robustness</span>
-          <span class="tag">embeddings</span>
-          <span class="tag">PyTorch</span>
-        </div>
+        <div class="tags" style="margin-bottom:16px"><span class="tag">adversarial ML</span><span class="tag">PGD</span><span class="tag">robustness</span><span class="tag">embeddings</span><span class="tag">PyTorch</span></div>
         <span class="go">Read the write up →</span>
       </a>
 
       <div class="grid">
-        <div class="card reveal">
+        <div class="card reveal"><span class="spot"></span>
           <h3>RAG Document Chat</h3>
           <p>Chat over your own documents with grounded, retrieval backed answers. Built end to end with a vector store and an LLM.</p>
           <div class="tags"><span class="tag">LangChain</span><span class="tag">ChromaDB</span><span class="tag">Claude Haiku</span><span class="tag">MiniLM</span></div>
         </div>
-        <div class="card reveal" style="--i:1">
+        <div class="card reveal" style="--i:1"><span class="spot"></span>
           <h3>Customer Churn Prediction</h3>
           <p>A churn model trained and deployed as a live service with an interactive frontend, so predictions run on demand.</p>
           <div class="tags"><span class="tag">XGBoost</span><span class="tag">FastAPI</span><span class="tag">Streamlit</span><span class="tag">Render</span></div>
         </div>
-        <div class="card reveal" style="--i:2">
+        <div class="card reveal" style="--i:2"><span class="spot"></span>
           <h3>Stock Time Series Forecasting</h3>
           <p>Forecasting Microsoft stock movement, comparing gradient boosted trees against a dedicated forecasting model.</p>
           <div class="tags"><span class="tag">XGBoost</span><span class="tag">Prophet</span><span class="tag">time series</span></div>
         </div>
-        <div class="card reveal" style="--i:3">
+        <div class="card reveal" style="--i:3"><span class="spot"></span>
           <h3>Image Denoising</h3>
           <p>A convolutional denoiser trained on real world sensor noise, recovering clean images from noisy captures.</p>
           <div class="tags"><span class="tag">DnCNN</span><span class="tag">Conv2D</span><span class="tag">SIDD</span></div>
         </div>
-        <div class="card reveal" style="--i:4">
+        <div class="card reveal" style="--i:4"><span class="spot"></span>
           <h3>Crash Resistant Portfolio Model</h3>
           <p>A portfolio construction model built to hold its footing through market downturns, not only in calm periods.</p>
           <div class="tags"><span class="tag">quant finance</span><span class="tag">optimisation</span><span class="tag">risk</span></div>
         </div>
-        <div class="card reveal" style="--i:5">
+        <div class="card reveal" style="--i:5"><span class="spot"></span>
           <h3>Fandango Rating Inflation</h3>
           <p>A statistical study of whether a film ratings site inflates its scores, using hypothesis testing in R.</p>
           <div class="tags"><span class="tag">R</span><span class="tag">t-tests</span><span class="tag">statistics</span></div>
@@ -378,23 +352,11 @@
   <!-- EXPERIENCE -->
   <section class="block" id="experience">
     <div class="d-wrap">
-      <div class="sec-head reveal"><span class="sec-num">02</span><h2>Experience</h2></div>
+      <div class="sec-head reveal"><span class="sec-index">02</span><h2>Experience</h2></div>
       <div class="reveal">
-        <div class="row">
-          <div class="role">Data Scientist Intern <span class="org">· Speridian Technologies</span></div>
-          <div class="meta">current</div>
-          <div class="desc">Applying machine learning to real business data as part of the data science team.</div>
-        </div>
-        <div class="row">
-          <div class="role">Financial Quantitative Analyst <span class="org">· Shepherd Ventures</span></div>
-          <div class="meta">prior</div>
-          <div class="desc">Quantitative modelling and analysis in a venture and investment setting.</div>
-        </div>
-        <div class="row">
-          <div class="role">ML Research Assistant <span class="org">· MIT Manipal</span></div>
-          <div class="meta">prior</div>
-          <div class="desc">Research work on machine learning methods and experiments.</div>
-        </div>
+        <div class="row"><div class="role">Data Scientist Intern <span class="org">· Speridian Technologies</span></div><div class="meta">current</div><div class="desc">Applying machine learning to real business data as part of the data science team.</div></div>
+        <div class="row"><div class="role">Financial Quantitative Analyst <span class="org">· Shepherd Ventures</span></div><div class="meta">prior</div><div class="desc">Quantitative modelling and analysis in a venture and investment setting.</div></div>
+        <div class="row"><div class="role">ML Research Assistant <span class="org">· MIT Manipal</span></div><div class="meta">prior</div><div class="desc">Research work on machine learning methods and experiments.</div></div>
       </div>
     </div>
   </section>
@@ -402,18 +364,10 @@
   <!-- EDUCATION -->
   <section class="block" id="education">
     <div class="d-wrap">
-      <div class="sec-head reveal"><span class="sec-num">03</span><h2>Education</h2></div>
+      <div class="sec-head reveal"><span class="sec-index">03</span><h2>Education</h2></div>
       <div class="reveal">
-        <div class="row">
-          <div class="role">University of Wisconsin–Madison</div>
-          <div class="meta">GPA 3.90</div>
-          <div class="desc">B.S. Data Science, minor in Computer Science.</div>
-        </div>
-        <div class="row">
-          <div class="role">Manipal Institute of Technology</div>
-          <div class="meta"></div>
-          <div class="desc">B.S.</div>
-        </div>
+        <div class="row"><div class="role">University of Wisconsin–Madison</div><div class="meta">GPA 3.90</div><div class="desc">B.S. Data Science, minor in Computer Science.</div></div>
+        <div class="row"><div class="role">Manipal Institute of Technology</div><div class="meta"></div><div class="desc">B.S.</div></div>
       </div>
     </div>
   </section>
@@ -421,24 +375,12 @@
   <!-- SKILLS -->
   <section class="block" id="skills">
     <div class="d-wrap">
-      <div class="sec-head reveal"><span class="sec-num">04</span><h2>Toolbox</h2></div>
+      <div class="sec-head reveal"><span class="sec-index">04</span><h2>Toolbox</h2></div>
       <div class="skills reveal">
-        <div class="skillgroup">
-          <div class="lbl">Languages</div>
-          <div class="tags"><span class="tag">Python</span><span class="tag">R</span><span class="tag">MATLAB</span><span class="tag">SQL</span></div>
-        </div>
-        <div class="skillgroup">
-          <div class="lbl">ML &amp; deep learning</div>
-          <div class="tags"><span class="tag">PyTorch</span><span class="tag">XGBoost</span><span class="tag">scikit-learn</span><span class="tag">CNNs</span><span class="tag">PCA</span></div>
-        </div>
-        <div class="skillgroup">
-          <div class="lbl">LLMs &amp; RAG</div>
-          <div class="tags"><span class="tag">LangChain</span><span class="tag">ChromaDB</span><span class="tag">Claude</span><span class="tag">embeddings</span></div>
-        </div>
-        <div class="skillgroup">
-          <div class="lbl">Deploy &amp; data</div>
-          <div class="tags"><span class="tag">FastAPI</span><span class="tag">Streamlit</span><span class="tag">Render</span><span class="tag">pandas</span></div>
-        </div>
+        <div class="skillgroup"><div class="lbl">Languages</div><div class="tags"><span class="tag">Python</span><span class="tag">R</span><span class="tag">MATLAB</span><span class="tag">SQL</span></div></div>
+        <div class="skillgroup"><div class="lbl">ML &amp; deep learning</div><div class="tags"><span class="tag">PyTorch</span><span class="tag">XGBoost</span><span class="tag">scikit-learn</span><span class="tag">CNNs</span><span class="tag">PCA</span></div></div>
+        <div class="skillgroup"><div class="lbl">LLMs &amp; RAG</div><div class="tags"><span class="tag">LangChain</span><span class="tag">ChromaDB</span><span class="tag">Claude</span><span class="tag">embeddings</span></div></div>
+        <div class="skillgroup"><div class="lbl">Deploy &amp; data</div><div class="tags"><span class="tag">FastAPI</span><span class="tag">Streamlit</span><span class="tag">Render</span><span class="tag">pandas</span></div></div>
       </div>
     </div>
   </section>
@@ -446,11 +388,11 @@
   <!-- ABOUT -->
   <section class="block about" id="about">
     <div class="d-wrap">
-      <div class="sec-head reveal"><span class="sec-num">05</span><h2>About</h2></div>
+      <div class="sec-head reveal"><span class="sec-index">05</span><h2>About</h2></div>
       <div class="reveal">
-        <p>I am a final year Data Science student at UW-Madison with a Computer Science minor, after a B.S. from Manipal Institute of Technology. My work spans data science, quantitative finance, and ML research, and I am drawn to the messy edge of machine learning, where models meet noise, adversaries, and data that does not behave.</p>
+        <p>I am a final year Data Science student at UW-Madison with a Computer Science minor, after a B.S. from Manipal Institute of Technology. My work spans data science, quantitative finance, and ML research, and I am drawn to the <b>messy edge of machine learning</b>, where models meet noise, adversaries, and data that does not behave.</p>
         <p>I like taking a problem all the way through: framing it, building the model, and getting it deployed where people can actually use it. The projects above are where that shows up in practice.</p>
-        <div class="contact-row" style="margin-top:8px">
+        <div class="contact-row" style="margin-top:10px">
           <a class="btn primary" href="mailto:samvedvivek1@gmail.com">Email</a>
           <a class="btn ghost" href="https://github.com/SamvedVivek">GitHub</a>
         </div>
@@ -471,18 +413,104 @@
 <script>
   document.documentElement.classList.add("js");
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* reveal */
   (function () {
-    var items = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
-    if (reduce || !("IntersectionObserver" in window)) {
-      items.forEach(function (el) { el.classList.add("in"); });
-      return;
-    }
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-      });
-    }, { threshold: 0.1, rootMargin: "0px 0px -6% 0px" });
+    var items = [].slice.call(document.querySelectorAll(".reveal"));
+    if (reduce || !("IntersectionObserver" in window)) { items.forEach(function (el) { el.classList.add("in"); }); return; }
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }); }, { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
     items.forEach(function (el) { io.observe(el); });
+  })();
+
+  /* pointer spotlight + 3D tilt on cards */
+  var fine = window.matchMedia("(pointer:fine)").matches;
+  [].slice.call(document.querySelectorAll(".card, .feature")).forEach(function (el) {
+    el.addEventListener("pointermove", function (e) {
+      var r = el.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+      el.style.setProperty("--mx", (px * 100) + "%");
+      el.style.setProperty("--my", (py * 100) + "%");
+      if (fine && !reduce) el.style.transform = "perspective(900px) rotateX(" + ((0.5 - py) * 6).toFixed(2) + "deg) rotateY(" + ((px - 0.5) * 6).toFixed(2) + "deg) translateY(-5px)";
+    });
+    el.addEventListener("pointerleave", function () { el.style.transform = ""; });
+  });
+
+  /* magnetic buttons (desktop pointers only) */
+  if (!reduce && window.matchMedia("(pointer:fine)").matches) {
+    [].slice.call(document.querySelectorAll(".btn")).forEach(function (b) {
+      b.addEventListener("pointermove", function (e) {
+        var r = b.getBoundingClientRect();
+        var x = (e.clientX - r.left - r.width / 2) * 0.25;
+        var y = (e.clientY - r.top - r.height / 2) * 0.35;
+        b.style.transform = "translate(" + x + "px," + y + "px)";
+      });
+      b.addEventListener("pointerleave", function () { b.style.transform = ""; });
+    });
+  }
+
+  /* living, cursor-reactive neural network background */
+  (function () {
+    var canvas = document.getElementById("net");
+    if (!canvas) return;
+    var ctx = canvas.getContext("2d");
+    var W, H, DPR, pts = [], raf;
+    var mouse = { x: -9999, y: -9999 };
+    window.addEventListener("pointermove", function (e) { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
+    window.addEventListener("pointerdown", function (e) { mouse.x = e.clientX; mouse.y = e.clientY; });
+    window.addEventListener("pointerleave", function () { mouse.x = mouse.y = -9999; });
+    function resize() { DPR = Math.min(2, window.devicePixelRatio || 1); W = canvas.clientWidth; H = canvas.clientHeight; canvas.width = Math.max(1, W * DPR); canvas.height = Math.max(1, H * DPR); ctx.setTransform(DPR, 0, 0, DPR, 0, 0); }
+    function seed() { resize(); var n = Math.max(28, Math.min(68, Math.round(W * H / 22000))); pts = []; for (var i = 0; i < n; i++) pts.push({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 0.22, vy: (Math.random() - 0.5) * 0.22 }); }
+    var LINK = 152, MR = 160;
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+      for (var i = 0; i < pts.length; i++) {
+        var p = pts[i]; p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1;
+        var mdx = p.x - mouse.x, mdy = p.y - mouse.y, md = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (md < MR && md > 0.1) { var f = (1 - md / MR) * 0.7; p.x += (mdx / md) * f; p.y += (mdy / md) * f; }
+      }
+      for (var a = 0; a < pts.length; a++) for (var b = a + 1; b < pts.length; b++) {
+        var dx = pts[a].x - pts[b].x, dy = pts[a].y - pts[b].y, dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < LINK) { ctx.strokeStyle = "rgba(124,140,255," + (1 - dist / LINK) * 0.5 + ")"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pts[a].x, pts[a].y); ctx.lineTo(pts[b].x, pts[b].y); ctx.stroke(); }
+      }
+      if (mouse.x > -9000) {
+        var R2 = MR + 40;
+        for (var i = 0; i < pts.length; i++) { var dx = pts[i].x - mouse.x, dy = pts[i].y - mouse.y, dist = Math.sqrt(dx * dx + dy * dy); if (dist < R2) { ctx.strokeStyle = "rgba(169,139,255," + (1 - dist / R2) * 0.6 + ")"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke(); } }
+      }
+      for (var i = 0; i < pts.length; i++) {
+        var p = pts[i], near = mouse.x > -9000 && Math.abs(p.x - mouse.x) < MR && Math.abs(p.y - mouse.y) < MR;
+        ctx.beginPath(); ctx.arc(p.x, p.y, near ? 2.5 : 1.7, 0, 6.2832); ctx.fillStyle = near ? "rgba(124,140,255,0.95)" : "rgba(169,139,255,0.85)"; ctx.fill();
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    seed(); frame();
+    if (reduce) cancelAnimationFrame(raf);
+    var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(seed, 200); });
+  })();
+
+  /* cursor glow follow */
+  (function () {
+    var g = document.querySelector(".cursor-glow");
+    if (!g || reduce || !window.matchMedia("(pointer:fine)").matches) return;
+    var tx = 0, ty = 0, x = 0, y = 0, shown = false;
+    window.addEventListener("pointermove", function (e) { tx = e.clientX; ty = e.clientY; if (!shown) { shown = true; g.style.opacity = "1"; } });
+    (function loop() { x += (tx - x) * 0.16; y += (ty - y) * 0.16; g.style.left = x + "px"; g.style.top = y + "px"; requestAnimationFrame(loop); })();
+  })();
+
+  /* decode text: resolve the name from noise */
+  (function () {
+    if (reduce) return;
+    var glyph = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789#%&/<>*+";
+    [].slice.call(document.querySelectorAll(".decode")).forEach(function (el, k) {
+      var final = el.textContent, frame = 0;
+      function step() {
+        var out = "";
+        for (var i = 0; i < final.length; i++) { if (final[i] === " ") out += " "; else if (i < frame / 2.2) out += final[i]; else out += glyph[Math.floor(Math.random() * glyph.length)]; }
+        el.textContent = out;
+        if (frame / 2.2 < final.length) { frame++; requestAnimationFrame(step); } else { el.textContent = final; }
+      }
+      setTimeout(step, 220 + k * 40);
+    });
   })();
 </script>
 
