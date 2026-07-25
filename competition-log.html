@@ -207,8 +207,8 @@
 <section class="mob-hero">
   <p class="eyebrow reveal decode">Neural network competition log</p>
   <h1 class="reveal" style="--i:1">Signal, noise, and a few <em>honest tricks.</em></h1>
-  <p class="lede reveal" style="--i:2">Five classification competitions in adversarial and noise robust machine learning, and the strategy behind each entry. All five cleared with full scores.</p>
-  <div class="metabox reveal" style="--i:3">5 competitions · A1–A5 · <b>5 / 5 scores</b></div>
+  <p class="lede reveal" style="--i:2">Five classification competitions in adversarial and noise robust machine learning, and the strategy behind each entry. All five cleared.</p>
+  <div class="metabox reveal" style="--i:3">5 competitions · A1–A5 · <b>5 / 5 cleared</b></div>
   <nav class="chips reveal" style="--i:4; margin-top:22px" aria-label="Strategies">
     <a href="#a1">A1</a><a href="#a2">A2</a><a href="#a3">A3</a><a href="#a4">A4</a><a href="#a5">A5</a>
   </nav>
@@ -220,7 +220,7 @@
   <p class="eyebrow decode">Competition log</p>
   <h1>Signal, noise, and a few <em>honest tricks.</em></h1>
   <p class="lede">Five competitions in adversarial and noise robust ML, and the strategy behind each.</p>
-  <div class="metabox">5 competitions · <b>5 / 5 scores</b></div>
+  <div class="metabox">5 competitions · <b>5 / 5 cleared</b></div>
 
   <nav class="desk-nav" aria-label="Strategies">
     <a href="#a1" data-target="a1"><span class="tick"></span><span class="rk">A1</span> noise robustness</a>
@@ -399,7 +399,7 @@
           <div class="cell"><span class="k">alignment</span><span class="v hot">Procrustes 0.891</span></div>
           <div class="cell"><span class="k">search</span><span class="v">greedy + local swap</span></div>
           <div class="cell"><span class="k">team</span><span class="v">closed #3</span></div>
-          <div class="cell"><span class="k">fallback</span><span class="v">honest rephrase</span></div>
+          <div class="cell"><span class="k">fallback</span><span class="v">tiny tweaks near target</span></div>
         </div>
 
         <p class="phase reveal">Phase 1 · the two spaces did not line up</p>
@@ -416,7 +416,7 @@
 
         <div class="note reveal">
           <span class="tag">Insight</span>
-          <p>Q7 hit the 1.0000 ceiling, and the simulator showed roughly 0.99 solo when raw vectors are pasted, against a slower coordination climb when sentences are embedded again. So the honest rephrase stayed as a safe baseline we could always submit, the same fallback logic as A4.</p>
+          <p>Our safe baseline was to make only tiny tweaks to each sentence so it stayed close to the target, a dependable score we could always fall back on. It held up: Q7 hit the 1.0000 ceiling, and the simulator showed roughly 0.99 solo when raw vectors are pasted, against a slower coordination climb when sentences are embedded again. Same fallback logic as the confidence baseline in A4.</p>
         </div>
 
         <div class="note attack reveal">
