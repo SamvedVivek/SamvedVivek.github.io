@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Samved Vivek — Data Scientist</title>
-<meta name="description" content="Samved Vivek: data science and machine learning." />
+<meta name="description" content="Samved Vivek: data science and machine learning. Adversarial robustness, forecasting, RAG systems, and models shipped end to end." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -99,7 +99,8 @@
 
   /* section headers with big numerals */
   .sec-head { display: flex; align-items: flex-end; gap: 18px; margin-bottom: 34px; padding-bottom: 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
-  .sec-index { font-family: var(--display); font-weight: 700; font-size: clamp(2.3rem, 5vw, 3.3rem); line-height: 0.72; color: transparent; -webkit-text-stroke: 1px var(--border-2); letter-spacing: -0.03em; }
+  .sec-index { font-family: var(--display); font-weight: 700; font-size: clamp(2.3rem, 5vw, 3.3rem); line-height: 0.72; color: transparent; -webkit-text-stroke: 1px var(--border-2); letter-spacing: -0.03em; transition: color .4s, text-shadow .4s, -webkit-text-stroke-color .4s; }
+  .sec-index.lit { color: rgba(124,140,255,0.14); -webkit-text-stroke-color: var(--signal); text-shadow: 0 0 34px rgba(124,140,255,0.45); }
   .sec-head h2 { font-family: var(--display); font-weight: 600; font-size: clamp(1.5rem, 3.6vw, 2rem); letter-spacing: -0.02em; margin: 0; }
   .sec-head .grow { flex: 1; }
   .sec-head .more { font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft); }
@@ -120,6 +121,8 @@
   .feature h3 { font-family: var(--display); font-weight: 600; font-size: 1.65rem; letter-spacing: -0.02em; margin: 0 0 12px; }
   .feature p { margin: 0 0 16px; color: var(--ink-soft); max-width: 60ch; }
   .feature .go { font-family: var(--mono); font-size: 12.5px; color: var(--signal); font-weight: 500; }
+  .feature .fcredit { font-family: var(--mono); font-size: 12.5px; color: var(--ink-faint); margin: 0 0 14px; }
+  .feature .fcredit b { color: var(--signal); font-weight: 500; }
 
   /* project grid */
   .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
@@ -248,7 +251,7 @@
 <section class="mob-hero">
   <p class="eyebrow reveal">Data scientist</p>
   <h1 class="reveal grad decode" style="--i:1">Samved Vivek</h1>
-  <p class="lede reveal" style="--i:2">Machine learning that holds up under <b>noise, adversaries, and messy real data</b>. Data science at UW-Madison, with work across quant finance and ML research.</p>
+  <p class="lede reveal" style="--i:2">Machine learning that holds up under <b>noise, adversaries, and messy real data</b>, shipped end to end. Data science at UW-Madison, with work across quant finance and ML research.</p>
   <div class="cta reveal" style="--i:3">
     <a class="btn primary full" href="competition-log.html">View the competition log →</a>
     <a class="btn ghost" href="#work">Work</a>
@@ -259,7 +262,7 @@
     <ul>
       <li><span class="m">›</span> <span>Data Scientist intern at <b>Speridian Technologies</b></span></li>
       <li><span class="m">›</span> <span>Final year, Data Science at <b>UW-Madison</b> (CS minor, GPA 3.90)</span></li>
-      <li><span class="m">›</span> <span>ML model implementations</span></li>
+      <li><span class="m">›</span> <span>Shipping ML models from training to deployment</span></li>
     </ul>
   </div>
 </section>
@@ -269,7 +272,7 @@
   <div class="brandline"><b>samved</b> / portfolio</div>
   <h1 class="grad decode">Samved Vivek</h1>
   <p class="eyebrow">Data scientist</p>
-  <p class="lede">Machine learning strategies that holds up under <b>noise, adversaries, and messy real data</b>.</p>
+  <p class="lede">Machine learning that holds up under <b>noise, adversaries, and messy real data</b>, shipped end to end.</p>
   <nav class="desk-nav" aria-label="Sections">
     <a href="#work">Selected work</a>
     <a href="#experience">Experience</a>
@@ -282,7 +285,7 @@
     <ul>
       <li><span class="m">›</span> <span>Intern at <b>Speridian</b></span></li>
       <li><span class="m">›</span> <span>Final year at <b>UW-Madison</b></span></li>
-      <li><span class="m">›</span> <span>ML model implementations</span></li>
+      <li><span class="m">›</span> <span>Shipping ML end to end</span></li>
     </ul>
   </div>
   <div class="side-contact">
@@ -309,6 +312,7 @@
         <span class="spot"></span><span class="accent grad-anim"></span>
         <div class="frow"><span class="chip solid">Featured</span><span class="chip win">5 / 5 scores</span></div>
         <h3>CS540 Competition Log</h3>
+        <p class="fcredit">with <b>Jae Woo Song</b> and <b>Nick Newcomer</b></p>
         <p>Five machine learning competitions in adversarial and noise robust classification, cleared in full. Noise robust training, PGD confidence attacks, style clustered digit generation, and aligning two embedding spaces with Procrustes to steer a debate agent. Written up strategy by strategy.</p>
         <div class="tags" style="margin-bottom:16px"><span class="tag">adversarial ML</span><span class="tag">PGD</span><span class="tag">robustness</span><span class="tag">embeddings</span><span class="tag">PyTorch</span></div>
         <span class="go">Read the write up →</span>
@@ -447,6 +451,25 @@
       b.addEventListener("pointerleave", function () { b.style.transform = ""; });
     });
   }
+
+  /* ignite the active section numeral on scroll */
+  (function () {
+    var sections = ["work", "experience", "education", "skills", "about"].map(function (id) { return document.getElementById(id); });
+    var idx = [].slice.call(document.querySelectorAll(".sec-index"));
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var line = window.innerHeight * 0.42;
+      var current = sections[0];
+      sections.forEach(function (s) { if (s && s.getBoundingClientRect().top <= line) current = s; });
+      var curIdx = current ? current.querySelector(".sec-index") : null;
+      idx.forEach(function (el) { el.classList.toggle("lit", el === curIdx); });
+    }
+    function onScroll() { if (!ticking) { requestAnimationFrame(update); ticking = true; } }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+  })();
 
   /* living, cursor-reactive neural network background */
   (function () {
